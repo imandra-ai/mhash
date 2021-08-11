@@ -1,0 +1,4 @@
+*.merlin
+_opam
+_build
+*.exe

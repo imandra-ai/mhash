@@ -1,0 +1,6 @@
+(library
+  (name ppx_deriving_hash_fnv)
+  (public_name ppx_deriving_hash.fnv)
+  (synopsis "An instance of HASHABLE using FNV")
+  (libraries ppx_deriving_hash.runtime)
+  (flags :standard -warn-error -a+8))
