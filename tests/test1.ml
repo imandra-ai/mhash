@@ -28,8 +28,8 @@ let () =
   ()
 
 let () =
-  let h1 = hash_foo1 A in
-  let h2 = hash_foo1 B in
+  let h1 = hash_foo1 ~algo:Fnv.int A in
+  let h2 = hash_foo1 ~algo:Fnv.int B in
   assert (h1<>h2);
   ()
 

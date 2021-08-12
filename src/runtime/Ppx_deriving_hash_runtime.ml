@@ -17,7 +17,7 @@ type ('ctx, 'output) hash_algo =  {
   char : 'ctx -> char -> unit;
 }
 
-type 'a hashable = {
+type 'a hasher = {
   hash_into:
     'ctx 'out.
     ('ctx, 'out) hash_algo ->
@@ -30,10 +30,30 @@ type 'a hashable = {
     and other hashable instances.
     This works for any concrete hash function that implements {!HASH_ALGO}. *)
 
+let bytes = { hash_into=fun algo ctx x -> algo.bytes ctx x }
+let string = { hash_into=fun algo ctx x -> algo.string ctx x }
+let int = { hash_into=fun algo ctx x -> algo.int ctx x }
+let int32 = { hash_into=fun algo ctx x -> algo.int32 ctx x }
+let int64 = { hash_into=fun algo ctx x -> algo.int64 ctx x }
+let bool = { hash_into=fun algo ctx x -> algo.bool ctx x }
+let char = { hash_into=fun algo ctx x -> algo.char ctx x }
+
+(** Trivial hasher, does nothing. *)
+let trivial = { hash_into=fun _ _ _ -> () }
+
+(** Option hasher *)
+let option h = {
+  hash_into=fun algo ctx xopt -> match xopt with
+    | None -> algo.bool ctx false;
+    | Some x ->
+      algo.bool ctx true;
+      h.hash_into algo ctx x
+}
+
 let[@inline] hash
     (type output) (type ctx)
     ~(algo:_ hash_algo)
-    ~(hash:_ hashable) x : output =
+    ~(hash:_ hasher) x : output =
   let ctx = algo.init () in
   hash.hash_into algo ctx x;
   algo.finalize ctx
