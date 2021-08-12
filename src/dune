@@ -1,6 +1,7 @@
 
 (library
   (name ppx_deriving_hash)
+  (public_name ppx_deriving_hash)
   (kind ppx_deriver)
   (ppx_runtime_libraries ppx_deriving_hash.runtime)
   (libraries ppxlib)
