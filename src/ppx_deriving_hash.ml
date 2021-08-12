@@ -69,6 +69,16 @@ let rec hash_expr_of_type (e:expression) ~(ty:core_type) : expression =
           [%e hash_expr_of_type [%expr x] ~ty:ty_arg0]
       end]
 
+  | [%type: [%t? ty_arg0] list] ->
+    [%expr List.iter
+        (fun x -> [%e hash_expr_of_type [%expr x] ~ty:ty_arg0])
+        [%e e]]
+
+  | [%type: [%t? ty_arg0] array] ->
+    [%expr Array.iter
+        (fun x -> [%e hash_expr_of_type [%expr x] ~ty:ty_arg0])
+        [%e e]]
+
   | {ptyp_desc=Ptyp_constr (lid, args); ptyp_loc=loc; _} ->
     (* find hasher for this type and apply it to args, themselves hashers *)
     let h = A.Exp.ident {loc;txt=hasher_name_of_lid lid.txt} in
@@ -177,7 +187,7 @@ let hash_expr_of_tydecl (decl:type_declaration) : expression =
       let e =
         labels
         |> List.map
-          (fun {pld_name=field_name; pld_type; pld_loc=loc;_} ->
+          (fun {pld_name=field_name; pld_type; _} ->
              let self_field =
                A.Exp.field self @@ lid_of_str field_name in
              hash_expr_of_type self_field ~ty:pld_type)

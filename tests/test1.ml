@@ -54,5 +54,11 @@ let () =
   assert (h1<>h2);
   ()
 
+type foos = {
+  all_foos: Foo.t list list;
+  any_foo: Foo.t option;
+  big_data_foo: Foo.t array;
+} [@@deriving hash]
+
 let () =
   print_endline "OK"
