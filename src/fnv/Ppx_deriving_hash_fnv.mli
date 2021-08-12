@@ -1,3 +1,4 @@
 
-module Int64 : Ppx_deriving_hash_runtime.HASH_ALGO with type output = int64
-module Int : Ppx_deriving_hash_runtime.HASH_ALGO with type output = int
+type ctx
+val int64 : (ctx, int64) Ppx_deriving_hash_runtime.hash_algo
+val int : (ctx, int) Ppx_deriving_hash_runtime.hash_algo

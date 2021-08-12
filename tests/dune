@@ -1,6 +1,6 @@
 
-(executable
+(test
   (name test1)
   (modes native)
-  (libraries ppx_deriving_hash.fnv)
+  (libraries ppx_deriving_hash.runtime ppx_deriving_hash.fnv)
   (preprocess (pps ppx_deriving_hash)))

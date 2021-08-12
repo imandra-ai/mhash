@@ -1,29 +1,26 @@
 
 
 (** A hash algorithm, like murmur3, Sha1, FNV, etc. *)
-module type HASH_ALGO = sig
-  type ctx
-  type output
+type ('ctx, 'output) hash_algo =  {
+  init : unit -> 'ctx;
+  finalize : 'ctx -> 'output;
 
-  val init : unit -> ctx
-  val finalize : ctx -> output
-
-  val bytes : ctx -> bytes -> unit
-  val subbytes : ctx -> bytes -> int -> int -> unit
-  val string : ctx -> string -> unit
-  val substring : ctx -> string -> int -> int -> unit
-  val bool : ctx -> bool -> unit
-  val int : ctx -> int -> unit
-  val int32 : ctx -> int32 -> unit
-  val int64 : ctx -> int64 -> unit
-  val nativeint : ctx -> nativeint -> unit
-  val char : ctx -> char -> unit
-end
+  bytes : 'ctx -> bytes -> unit;
+  subbytes : 'ctx -> bytes -> int -> int -> unit;
+  string : 'ctx -> string -> unit;
+  substring : 'ctx -> string -> int -> int -> unit;
+  bool : 'ctx -> bool -> unit;
+  int : 'ctx -> int -> unit;
+  int32 : 'ctx -> int32 -> unit;
+  int64 : 'ctx -> int64 -> unit;
+  nativeint : 'ctx -> nativeint -> unit;
+  char : 'ctx -> char -> unit;
+}
 
 type 'a hashable = {
   hash_into:
     'ctx 'out.
-    (module HASH_ALGO with type ctx = 'ctx and type output = 'out) ->
+    ('ctx, 'out) hash_algo ->
     'ctx ->
     'a -> unit
 } [@@unboxed]
@@ -35,9 +32,8 @@ type 'a hashable = {
 
 let[@inline] hash
     (type output) (type ctx)
-    ~(algo:(module HASH_ALGO with type output=output and type ctx=ctx))
+    ~(algo:_ hash_algo)
     ~(hash:_ hashable) x : output =
-  let module Algo = (val algo) in
-  let ctx = Algo.init () in
+  let ctx = algo.init () in
   hash.hash_into algo ctx x;
-  Algo.finalize ctx
+  algo.finalize ctx
