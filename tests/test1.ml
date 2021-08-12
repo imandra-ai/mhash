@@ -60,5 +60,14 @@ type foos = {
   big_data_foo: Foo.t array;
 } [@@deriving hash]
 
+module Poly : sig
+  type ('a, 'b) poly [@@deriving hash]
+end = struct
+  type ('a, 'b) poly = {
+    p_list: 'a list;
+    p_tup: ('a * 'b option) option;
+  } [@@deriving hash]
+end
+
 let () =
   print_endline "OK"
