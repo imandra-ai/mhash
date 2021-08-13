@@ -196,6 +196,19 @@ let hash_expr_of_tydecl (decl:type_declaration) : expression =
             let lhs = A.Pat.construct (lid_of_str cname) None
             and rhs = hash_cstor_idx in
             lhs, rhs
+          | Pcstr_tuple [ty0] ->
+            let lhs =
+              let x0 = A.Pat.var {loc;txt="x"} in
+              A.Pat.construct (lid_of_str cname) (Some x0) in
+            let rhs =
+              let x0 = A.Exp.ident @@ lid ~loc "x" in
+              [%expr
+                [%e hash_cstor_idx];
+                [%e hash_expr_of_type x0 ~ty:ty0]
+              ]
+            in
+            lhs, rhs
+
           | Pcstr_tuple l ->
             let lhs =
               let pat =
