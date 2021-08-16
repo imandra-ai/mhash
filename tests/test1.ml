@@ -63,9 +63,12 @@ type big_sum =
   | B4 of {x: int; y: string; z: bool option}
 [@@deriving hash]
 
+type not_hashable = private string
+
 type foos = {
   all_foos: Foo.t list list;
   any_foo: Foo.t option;
+  foos_ignore: (not_hashable [@nohash]);
   big_data_foo: Foo.t array;
 } [@@deriving hash]
 
@@ -74,7 +77,8 @@ module Poly : sig
 end = struct
   type ('a, 'b) poly = {
     p_list: 'a list;
-    p_tup: ('a * 'b option) option;
+    p_tup: ('a * 'b *
+            ('b [@hasher Ppx_deriving_hash_runtime.trivial]) option) option;
   } [@@deriving hash]
 end
 

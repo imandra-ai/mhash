@@ -7,8 +7,6 @@ module A = Ast_helper
 module B = Ast_builder.Default
 let spf = Printf.sprintf
 
-(* TODO *)
-
 let hasher_name_of_ty_name (ty_name:string) : string =
   if ty_name = "t" then "hasher" else "hasher_" ^ ty_name
 
@@ -53,6 +51,20 @@ let mk_arrow ~loc args body =
     (fun arg bod -> [%type: [%t arg] -> [%t bod]])
     args body
 
+(* attribute to define hasher manually *)
+let attr_hasher =
+  Attribute.declare "hash.hasher"
+    Attribute.Context.core_type
+    Ast_pattern.(single_expr_payload __)
+    (fun x -> x)
+
+(* attribute to skip hashing *)
+let attr_no_hash =
+  Attribute.declare "hash.nohash"
+    Attribute.Context.core_type
+    Ast_pattern.(pstr nil)
+    (fun () -> ())
+
 (* apply hasher expression to expression to be hashed *)
 let apply_hasher ~loc e_hasher e : expression =
   [%expr
@@ -60,12 +72,23 @@ let apply_hasher ~loc e_hasher e : expression =
     let h = [%e e_hasher] in
     h.Ppx_deriving_hash_runtime.hash_into algo ctx e]
 
+let is_some_ = function Some _ -> true | None -> false
+
 (* produce an expression that hashes [e].
    In scope: [algo] and [ctx]. *)
 let rec hash_expr_of_type (e:expression) ~(ty:core_type) : expression =
   let loc = ty.ptyp_loc in
   let by_hasher h = apply_hasher ~loc h e in (* just apply a hasher *)
   match ty with
+  | _ when is_some_ (Attribute.get attr_no_hash ty) ->
+    [%expr ()] (* do not hash *)
+  | _ when is_some_ (Attribute.get ~mark_as_seen:false attr_hasher ty) ->
+    (* custom hasher *)
+    let hasher = match Attribute.get ~mark_as_seen:true attr_hasher ty with
+      | None -> assert false
+      | Some h -> h
+    in
+    apply_hasher ~loc hasher e
   | [%type: int] -> by_hasher [%expr Ppx_deriving_hash_runtime.int]
   | [%type: int32] -> by_hasher [%expr Ppx_deriving_hash_runtime.int32]
   | [%type: int64] -> by_hasher [%expr Ppx_deriving_hash_runtime.int64]
