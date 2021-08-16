@@ -50,6 +50,29 @@ let option h = {
       h.hash_into algo ctx x
 }
 
+(** Hash a list *)
+let list h = {
+  hash_into=fun algo ctx l ->
+    List.iter (h.hash_into algo ctx) l
+}
+
+let array h = {
+  hash_into=fun algo ctx l ->
+    Array.iter (h.hash_into algo ctx) l
+}
+
+(** Hash an iterator *)
+let iter h = {
+  hash_into=fun algo ctx iter ->
+    iter (h.hash_into algo ctx);
+}
+
+(** Hash a sequence of items *)
+let seq s = {
+  hash_into=fun algo ctx l ->
+    Seq.iter (s.hash_into algo ctx) l
+}
+
 let[@inline] hash
     (type output) (type ctx)
     ~(algo:_ hash_algo)
