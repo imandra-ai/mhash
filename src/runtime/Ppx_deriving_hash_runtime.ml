@@ -50,6 +50,12 @@ let option h = {
       h.hash_into algo ctx x
 }
 
+(** [map ~f h] applies hasher [h] to [f x] in order to hash [x]. *)
+let map ~f h = {
+  hash_into=fun algo ctx x ->
+    h.hash_into algo ctx (f x)
+}
+
 (** Hash a list *)
 let list h = {
   hash_into=fun algo ctx l ->
