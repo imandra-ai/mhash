@@ -33,6 +33,7 @@ type 'a hasher = {
 let bytes = { hash_into=fun algo ctx x -> algo.bytes ctx x }
 let string = { hash_into=fun algo ctx x -> algo.string ctx x }
 let int = { hash_into=fun algo ctx x -> algo.int ctx x }
+let nativeint = { hash_into=fun algo ctx x -> algo.nativeint ctx x }
 let int32 = { hash_into=fun algo ctx x -> algo.int32 ctx x }
 let int64 = { hash_into=fun algo ctx x -> algo.int64 ctx x }
 let bool = { hash_into=fun algo ctx x -> algo.bool ctx x }

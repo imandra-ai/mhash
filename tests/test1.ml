@@ -41,11 +41,12 @@ module Foo : sig
 end = struct
   type t = {
     x: bool * string;
-    y: bool option
+    y: bool option;
+    z: nativeint * int32 * int64 * char;
   } [@@deriving hash]
 
-  let x1 = {x=true, "x"; y=None}
-  let x2 = {x=false, "y"; y=Some true}
+  let x1 = {x=true, "x"; y=None; z=1n, 1l, 1L, '1'}
+  let x2 = {x=false, "y"; y=Some true; z=2n,2l,2L, '2'}
 end
 
 let () =
