@@ -60,7 +60,7 @@ type big_sum =
   | B1
   | B2 of int
   | B3 of int * bool
-(*   | B4 of {x: int; y: string; z: bool option} *)
+  | B4 of {x: int; y: string; z: bool option}
 [@@deriving hash]
 
 type foos = {

@@ -237,9 +237,26 @@ let hash_expr_of_tydecl (decl:type_declaration) : expression =
               [%expr [%e hash_cstor_idx]; [%e hash_fields] ]
             in
             lhs, rhs
-          | Pcstr_record _r ->
-            A.Pat.construct (lid_of_str cname) (Some (A.Pat.any ())),
-            [%expr [%error "cannot handle inline records yet"]] (* FIXME *)
+
+          | Pcstr_record r ->
+            (* variable for the record *)
+            let pat_r = A.Pat.var {loc;txt="r"} in
+            let lhs = A.Pat.construct (lid_of_str cname) (Some pat_r) in
+            let rhs =
+              (* variable for the inline record *)
+              let var_r = A.Exp.ident (lid ~loc "r") in
+              let hash_fields =
+                r
+                |> List.map
+                  (fun {pld_name;pld_loc=_;pld_type;_} ->
+                     let field = A.Exp.field var_r (lid_of_str pld_name) in
+                     hash_expr_of_type field ~ty:pld_type)
+                |> mk_seq ~loc
+              in
+              (* hash constructor index, then arguments *)
+              [%expr [%e hash_cstor_idx]; [%e hash_fields] ]
+            in
+            lhs, rhs
         in
         B.case ~lhs ~guard:None ~rhs
       in
