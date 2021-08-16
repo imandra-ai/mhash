@@ -74,6 +74,10 @@ let rec hash_expr_of_type (e:expression) ~(ty:core_type) : expression =
   | [%type: bytes] -> by_hasher [%expr Ppx_deriving_hash_runtime.bytes]
   | [%type: bool] -> by_hasher [%expr Ppx_deriving_hash_runtime.bool]
   | [%type: unit] -> by_hasher [%expr Ppx_deriving_hash_runtime.trivial]
+  | [%type: float] ->
+    (* hash float as its bitwise representation (an int64) *)
+    apply_hasher ~loc [%expr Ppx_deriving_hash_runtime.int64]
+      [%expr Int64.bits_of_float [%e e]]
 
   | [%type: [%t? ty_arg0] option] ->
     [%expr
