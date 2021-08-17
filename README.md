@@ -1,4 +1,4 @@
-# Mhash + `ppx_deriving_mhash`
+# Mhash + `ppx_deriving_mhash` [![build](https://github.com/AestheticIntegration/ppx_deriving_hash/actions/workflows/main.yml/badge.svg)](https://github.com/AestheticIntegration/ppx_deriving_hash/actions/workflows/main.yml)
 
 This project contains:
 
