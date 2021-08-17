@@ -1,27 +1,32 @@
-# Ppx_deriving_hash
+# Mhash + `ppx_deriving_mhash`
 
-A deriving implementation for hashing functions.
+This project contains:
 
-It ships with a runtime library that implements some universal hashing
-interfaces, and an implementation of FNV.
+- `mhash`, to implement hashing for types in a way that is compatible with many
+  concrete hashing functions
+- `ppx_deriving_mhash` to automatically derive such hashers
 
-## Usage
+The `mhash` library comes with an implementation of
+the [FNV](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function)
+algorithm.
 
-After adding `(preprocess (pps ppx_deriving_hash))` in dune, this should work:
+## Using the ppx
+
+After adding `(preprocess (pps ppx_deriving_hhash))` in dune, this should work:
 
 ```ocaml
 # type foo = {
   x : int;
   y : string;
-} [@@deriving hash] ;;
+} [@@deriving mhash] ;;
 type foo = { x : int; y : string; }
-val hasher_foo : foo Ppx_deriving_hash_runtime.hasher =
-  {Ppx_deriving_hash_runtime.hash_into = <fun>}
-val hash_foo : algo:('a, 'b) Ppx_deriving_hash_runtime.hash_algo -> foo -> 'b =
+val hasher_foo : foo Mhash.hasher =
+  {Mhash.hash_into = <fun>}
+val hash_foo : algo:('a, 'b) Mhash.hash_algo -> foo -> 'b =
   <fun>
 
-# #require "ppx_deriving_hash.fnv";;
-# hash_foo ~algo:Ppx_deriving_hash_fnv.int {x=1; y="foo"};;
+# #require "mhash.fnv";;
+# hash_foo ~algo:Mhash_fnv.int {x=1; y="foo"};;
 - : int = 3535931368763302282
 ```
 
@@ -32,4 +37,4 @@ val hash_foo : algo:('a, 'b) Ppx_deriving_hash_runtime.hash_algo -> foo -> 'b =
   other fields that shouldn't affect the hash.
 - `[@hasher <expr>]` forces the ppx to use `<expr>` as the hasher for
   the given type.
-  The attribute for a type `ty` must be an expression of type `ty Ppx_deriving_hash_runtime.hasher`
+  The attribute for a type `ty` must be an expression of type `ty Mhash.hasher`
