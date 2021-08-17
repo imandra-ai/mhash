@@ -2,10 +2,13 @@
 (generate_opam_files true)
 (version 0.1)
 (license MIT)
-(name ppx_deriving_hash)
+(name mhash)
 
 (package
-  (name ppx_deriving_hash)
-  (synopsis "Ppx deriver for hash functions")
-  (depends
-    ppxlib))
+  (name mhash)
+  (synopsis "Modular Hashing library"))
+
+(package
+  (name ppx_deriving_mhash)
+  (synopsis "Ppx deriver for mhash")
+  (depends ppxlib))

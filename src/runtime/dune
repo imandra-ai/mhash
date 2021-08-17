@@ -1,4 +1,0 @@
-(library
-  (name ppx_deriving_hash_runtime)
-  (public_name ppx_deriving_hash.runtime)
-  (flags :standard -warn-error -a+8))

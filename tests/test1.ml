@@ -1,6 +1,6 @@
 
-module H = Ppx_deriving_hash_runtime
-module Fnv = Ppx_deriving_hash_fnv
+module H = Mhash
+module Fnv = Mhash_fnv
 
 type foo0 = {
   x: int;
@@ -79,7 +79,7 @@ end = struct
   type ('a, 'b) poly = {
     p_list: 'a list;
     p_tup: ('a * 'b *
-            ('b [@hasher Ppx_deriving_hash_runtime.trivial]) option) option;
+            ('b [@hasher H.trivial]) option) option;
   } [@@deriving hash]
 end
 

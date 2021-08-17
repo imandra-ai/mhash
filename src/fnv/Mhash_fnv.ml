@@ -1,7 +1,7 @@
 
 (* code adapted from Containers *)
 
-module H = Ppx_deriving_hash_runtime
+module H = Mhash
 
 type ctx = int64 ref
 

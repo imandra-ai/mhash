@@ -1,6 +1,6 @@
 (library
-  (name ppx_deriving_hash_fnv)
-  (public_name ppx_deriving_hash.fnv)
-  (synopsis "An instance of HASHABLE using FNV")
-  (libraries ppx_deriving_hash.runtime)
+  (name mhash_fnv)
+  (public_name mhash.fnv)
+  (synopsis "The FNV hash algorithm for Mhash")
+  (libraries mhash)
   (flags :standard -warn-error -a+8))

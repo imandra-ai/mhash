@@ -80,8 +80,9 @@ let seq s = {
     Seq.iter (s.hash_into algo ctx) l
 }
 
+(** Hash a value using the given algorithm and type hasher. *)
 let[@inline] hash
-    (type output) (type ctx)
+    (type output)
     ~(algo:_ hash_algo)
     ~(hash:_ hasher) x : output =
   let ctx = algo.init () in

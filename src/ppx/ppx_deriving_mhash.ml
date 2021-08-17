@@ -70,7 +70,7 @@ let apply_hasher ~loc e_hasher e : expression =
   [%expr
     let e = [%e e] in
     let h = [%e e_hasher] in
-    h.Ppx_deriving_hash_runtime.hash_into algo ctx e]
+    h.Mhash.hash_into algo ctx e]
 
 let is_some_ = function Some _ -> true | None -> false
 
@@ -89,26 +89,26 @@ let rec hash_expr_of_type (e:expression) ~(ty:core_type) : expression =
       | Some h -> h
     in
     apply_hasher ~loc hasher e
-  | [%type: int] -> by_hasher [%expr Ppx_deriving_hash_runtime.int]
-  | [%type: int32] -> by_hasher [%expr Ppx_deriving_hash_runtime.int32]
-  | [%type: int64] -> by_hasher [%expr Ppx_deriving_hash_runtime.int64]
-  | [%type: nativeint] -> by_hasher [%expr Ppx_deriving_hash_runtime.nativeint]
-  | [%type: string] -> by_hasher [%expr Ppx_deriving_hash_runtime.string]
-  | [%type: bytes] -> by_hasher [%expr Ppx_deriving_hash_runtime.bytes]
-  | [%type: bool] -> by_hasher [%expr Ppx_deriving_hash_runtime.bool]
-  | [%type: char] -> by_hasher [%expr Ppx_deriving_hash_runtime.char]
-  | [%type: unit] -> by_hasher [%expr Ppx_deriving_hash_runtime.trivial]
+  | [%type: int] -> by_hasher [%expr Mhash.int]
+  | [%type: int32] -> by_hasher [%expr Mhash.int32]
+  | [%type: int64] -> by_hasher [%expr Mhash.int64]
+  | [%type: nativeint] -> by_hasher [%expr Mhash.nativeint]
+  | [%type: string] -> by_hasher [%expr Mhash.string]
+  | [%type: bytes] -> by_hasher [%expr Mhash.bytes]
+  | [%type: bool] -> by_hasher [%expr Mhash.bool]
+  | [%type: char] -> by_hasher [%expr Mhash.char]
+  | [%type: unit] -> by_hasher [%expr Mhash.trivial]
   | [%type: float] ->
     (* hash float as its bitwise representation (an int64) *)
-    apply_hasher ~loc [%expr Ppx_deriving_hash_runtime.int64]
+    apply_hasher ~loc [%expr Mhash.int64]
       [%expr Int64.bits_of_float [%e e]]
 
   | [%type: [%t? ty_arg0] option] ->
     [%expr
       begin match [%e e] with
-        | None -> algo.Ppx_deriving_hash_runtime.bool ctx false
+        | None -> algo.Mhash.bool ctx false
         | Some x ->
-          algo.Ppx_deriving_hash_runtime.bool ctx true;
+          algo.Mhash.bool ctx true;
           [%e hash_expr_of_type [%expr x] ~ty:ty_arg0]
       end]
 
@@ -135,7 +135,7 @@ let rec hash_expr_of_type (e:expression) ~(ty:core_type) : expression =
       |> List.map
         (fun ty ->
            let hasher =
-             [%expr {Ppx_deriving_hash_runtime.hash_into=
+             [%expr {Mhash.hash_into=
                        fun algo ctx x -> [%e hash_expr_of_type [%expr x] ~ty]
                     }]
            in
@@ -214,7 +214,7 @@ let hash_expr_of_tydecl (decl:type_declaration) : expression =
       let hash_cstor (i:int) {pcd_args; pcd_name=cname; pcd_loc=loc; _} : case =
         (* hash the constructor index *)
         let hash_cstor_idx =
-          [%expr algo.Ppx_deriving_hash_runtime.int ctx
+          [%expr algo.Mhash.int ctx
               [%e (A.Exp.constant (A.Const.int i))]]
         in
 
@@ -299,7 +299,7 @@ let hash_expr_of_tydecl (decl:type_declaration) : expression =
       in
       e
   in
-  [%expr {Ppx_deriving_hash_runtime.hash_into=fun algo ctx self -> [%e body]}]
+  [%expr {Mhash.hash_into=fun algo ctx self -> [%e body]}]
 
 exception Error_gen of Location.t * string
 let error_gen ~loc e = raise (Error_gen (loc,e))
@@ -352,7 +352,7 @@ let generate_impl_ (rec_flag, type_declarations) =
         let rhs =
           fun_poly_hashers ~loc ty @@
           [%expr fun ~algo x ->
-            Ppx_deriving_hash_runtime.hash ~algo ~hash:[%e hasher] x]
+            Mhash.hash ~algo ~hash:[%e hasher] x]
         in
         A.Vb.mk (A.Pat.var {loc;txt=hash_name_of_ty ty}) rhs
       )
@@ -386,7 +386,7 @@ let generate_intf_ type_declarations =
          let poly_hashers =
            param_names ty
            |> List.map
-             (fun n -> [%type: ([%t (A.Typ.var n)]) Ppx_deriving_hash_runtime.hasher])
+             (fun n -> [%type: ([%t (A.Typ.var n)]) Mhash.hasher])
          in
 
          (* type expression for [ty], like [(int, bool) mypair] *)
@@ -399,7 +399,7 @@ let generate_intf_ type_declarations =
          let decl_hasher =
            let ty =
              mk_arrow ~loc poly_hashers @@
-             [%type: ([%t tye]) Ppx_deriving_hash_runtime.hasher]
+             [%type: ([%t tye]) Mhash.hasher]
            in
            A.Val.mk {loc;txt=name_hasher} ty
          in
@@ -409,7 +409,7 @@ let generate_intf_ type_declarations =
          let decl_hash =
            let ty =
              mk_arrow ~loc poly_hashers @@
-             [%type: algo:(_, 'out) Ppx_deriving_hash_runtime.hash_algo ->
+             [%type: algo:(_, 'out) Mhash.hash_algo ->
                [%t tye] -> 'out
              ]
            in
