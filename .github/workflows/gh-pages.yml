@@ -26,7 +26,7 @@ jobs:
         run: opam pin -n .
 
       - name: Depext
-        run: opam depext -yt mhash
+        run: opam depext -yt mhash mhash-sha
 
       - name: Deps
         run: opam install -d . --deps-only

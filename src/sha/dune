@@ -1,0 +1,6 @@
+
+(library
+  (name mhash_sha)
+  (public_name mhash-sha)
+  (libraries mhash sha)
+  (flags :standard -warn-error -a+8))

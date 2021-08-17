@@ -9,6 +9,11 @@
   (synopsis "Modular Hashing library"))
 
 (package
+  (name mhash-sha)
+  (depends mhash sha)
+  (synopsis "Mhash implementation for Sha"))
+
+(package
   (name ppx_deriving_mhash)
   (synopsis "Ppx deriver for mhash")
-  (depends ppxlib))
+  (depends mhash ppxlib))
