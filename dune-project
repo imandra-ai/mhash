@@ -6,11 +6,16 @@
 
 (package
   (name mhash)
+  (depends
+    (odoc :with-doc))
   (synopsis "Modular Hashing library"))
 
 (package
   (name mhash-sha)
-  (depends mhash sha)
+  (depends
+    mhash
+    sha
+    (odoc :with-doc))
   (synopsis "Mhash implementation for Sha"))
 
 (package
