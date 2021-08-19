@@ -132,6 +132,26 @@ let seq s = {
     Seq.iter (s.hash_into algo ctx) l
 }
 
+let pair h1 h2 = {
+  hash_into=fun algo ctx (x,y) -> h1.hash_into algo ctx x; h2.hash_into algo ctx y
+}
+
+let tup2 = pair
+let tup3 h1 h2 h3 = {
+  hash_into=fun algo ctx (x1,x2,x3) ->
+    h1.hash_into algo ctx x1;
+    h2.hash_into algo ctx x2;
+    h3.hash_into algo ctx x3;
+}
+
+let tup4 h1 h2 h3 h4 = {
+  hash_into=fun algo ctx (x1,x2,x3,x4) ->
+    h1.hash_into algo ctx x1;
+    h2.hash_into algo ctx x2;
+    h3.hash_into algo ctx x3;
+    h4.hash_into algo ctx x4;
+}
+
 (** Hash a value using the given algorithm and type hasher. *)
 let[@inline] hash
     (type output)
